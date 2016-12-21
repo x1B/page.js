@@ -129,6 +129,9 @@
 
   page.len = 0;
 
+
+  var baseDomain = '';
+
   /**
    * Get or set basepath to `path`.
    *
@@ -138,7 +141,10 @@
 
   page.base = function(path) {
     if (0 === arguments.length) return base;
-    base = path;
+    if (path.indexOf(location.origin) === 0) {
+       baseDomain = location.origin;
+    }
+    base = path.slice(baseDomain.length);
   };
 
   /**
@@ -166,7 +172,7 @@
     }
     if (true === options.hashbang) hashbang = true;
     if (!dispatch) return;
-    var url = (hashbang && ~location.hash.indexOf('#!')) ? location.hash.substr(2) + location.search : location.pathname + location.search + location.hash;
+    var url = (hashbang && ~location.hash.indexOf('#!')) ? location.hash.substr(2) + location.search : baseDomain + location.pathname + location.search + location.hash;
     page.replace(url, null, true, dispatch);
   };
 
@@ -328,7 +334,7 @@
     var current;
 
     if (hashbang) {
-      current = base + location.hash.replace('#!', '');
+      current = baseDomain + base + location.hash.replace('#!', '');
     } else {
       current = location.pathname + location.search;
     }
@@ -379,7 +385,7 @@
    */
 
   function Context(path, state) {
-    if ('/' === path[0] && 0 !== path.indexOf(base)) path = base + (hashbang ? '#!' : '') + path;
+    if ('/' === path[0] && 0 !== path.indexOf(base)) path = baseDomain + base + (hashbang ? '#!' : '') + path;
     var i = path.indexOf('?');
 
     this.canonicalPath = path;
