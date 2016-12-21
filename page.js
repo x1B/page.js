@@ -141,8 +141,9 @@
 
   page.base = function(path) {
     if (0 === arguments.length) return base;
-    if (path.indexOf(location.origin) === 0) {
-       baseDomain = location.origin;
+    var origin = locationOrigin();
+    if (path.indexOf(origin) === 0) {
+       baseDomain = origin;
     }
     base = path.slice(baseDomain.length);
   };
@@ -336,7 +337,7 @@
     if (hashbang) {
       current = baseDomain + base + location.hash.replace('#!', '');
     } else {
-      current = location.pathname + location.search;
+      current = baseDomain + location.pathname + location.search;
     }
 
     if (current === ctx.canonicalPath) return;
@@ -389,7 +390,7 @@
     var i = path.indexOf('?');
 
     this.canonicalPath = path;
-    this.path = path.replace(base, '') || '/';
+    this.path = path.replace(baseDomain + base, '') || '/';
     if (hashbang) this.path = this.path.replace('#!', '') || '/';
 
     this.title = document.title;
@@ -617,14 +618,19 @@
     return null === e.which ? e.button : e.which;
   }
 
+
+  function locationOrigin() {
+    var origin = location.protocol + '//' + location.hostname;
+    if (location.port) origin += ':' + location.port;
+    return origin;
+  }
+
   /**
    * Check if `href` is the same origin.
    */
 
   function sameOrigin(href) {
-    var origin = location.protocol + '//' + location.hostname;
-    if (location.port) origin += ':' + location.port;
-    return (href && (0 === href.indexOf(origin)));
+    return href && href.indexOf(locationOrigin()) === 0;
   }
 
   page.sameOrigin = sameOrigin;
