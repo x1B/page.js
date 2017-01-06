@@ -171,7 +171,7 @@
     }
     if (true === options.hashbang) hashbang = true;
     if (!dispatch) return;
-    var url = (hashbang && ~location.hash.indexOf('#!')) ? location.hash.substr(2) + location.search : baseDomain + location.pathname + location.search + location.hash;
+    var url = (hashbang && ~location.hash.indexOf('#!')) ? location.hash.substr(2) + location.search : location.pathname + location.search + location.hash;
     page.replace(url, null, true, dispatch);
   };
 
@@ -384,11 +384,11 @@
    */
 
   function Context(path, state) {
-    if ('/' === path[0] && 0 !== path.indexOf(base)) path = baseDomain + base + (hashbang ? '#!' : '') + path;
+    if ('/' === path[0] && 0 !== path.indexOf(base)) path = base + (hashbang ? '#!' : '') + path;
     var i = path.indexOf('?');
 
-    this.canonicalPath = path;
-    this.path = path.replace(baseDomain + base, '') || '/';
+    this.canonicalPath = baseDomain + path;
+    this.path = path.replace(base, '') || '/';
     if (hashbang) this.path = this.path.replace('#!', '') || '/';
 
     this.title = document.title;
